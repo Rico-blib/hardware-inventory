@@ -15,6 +15,8 @@ class Sale extends Model
         'total',
         'discount',
         'grand_total',    // ✅ Add this (if you want it stored)
+        'user_id',
+        'payment_method',
     ];
 
     public function customer()
@@ -25,5 +27,9 @@ class Sale extends Model
     public function items()
     {
         return $this->hasMany(SaleItem::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

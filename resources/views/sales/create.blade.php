@@ -86,6 +86,16 @@
                 <input type="text" id="total" class="w-full border px-2 py-1 rounded bg-gray-100" readonly
                     value="0.00">
             </div>
+            <div class="mb-4">
+                <label for="payment_method" class="block font-medium text-sm text-gray-700">Payment Method</label>
+                <select name="payment_method" id="payment_method" required
+                    class="form-select rounded-md shadow-sm mt-1 block w-full">
+                    <option value="">-- Select Payment Method --</option>
+                    <option value="cash">Cash</option>
+                    <option value="mpesa">M-PESA</option>
+                    <option value="bank">Bank Transfer</option>
+                </select>
+            </div>
 
             <!-- Submit -->
             <div class="mt-6">

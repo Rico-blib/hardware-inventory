@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SuperAdminOnly;
+use App\Http\Middleware\CheckTrial;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register route middleware aliases here
         $middleware->alias([
             'super-admin' => SuperAdminOnly::class,
+            'check.trial' => CheckTrial::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

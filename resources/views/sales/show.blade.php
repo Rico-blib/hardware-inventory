@@ -24,6 +24,7 @@
                         <th class="border px-2 py-1">Qty</th>
                         <th class="border px-2 py-1">Price (Ksh)</th>
                         <th class="border px-2 py-1">Subtotal</th>
+                        
                     </tr>
                 </thead>
                 <tbody>

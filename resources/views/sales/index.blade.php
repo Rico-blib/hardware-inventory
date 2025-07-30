@@ -57,6 +57,7 @@
                         <th class="px-4 py-2 text-left">Total</th>
                         <th class="px-4 py-2 text-left">Discount</th>
                         <th class="px-4 py-2 text-left">Grand Total</th>
+                        <th class="px-4 py-2 text-left">Payment Method</th>
                         <th class="px-4 py-2 text-center">Actions</th>
                     </tr>
                 </thead>
@@ -70,6 +71,7 @@
                             <td class="px-4 py-2">Ksh {{ number_format($sale->total, 2) }}</td>
                             <td class="px-4 py-2">Ksh {{ number_format($sale->discount, 2) }}</td>
                             <td class="px-4 py-2 font-bold">Ksh {{ number_format($sale->grand_total, 2) }}</td>
+                            <td class="px-4 py-2">{{ ucfirst($sale->payment_method) }}</td>
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     <a href="{{ route('sales.show', $sale->id) }}"

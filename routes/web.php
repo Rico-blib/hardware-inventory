@@ -14,29 +14,36 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\SuperAdminOnly;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ActivationController;
 
+
+
+Route::get('/activate', [ActivationController::class, 'show'])->name('activation.show');
+Route::post('/activate', [ActivationController::class, 'activate'])->name('activation.submit');
 // Public welcome
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [AuthenticatedSessionController::class, 'create'])->middleware('guest');
+
+
+// Dashboard - all authenticated users with trial check
+Route::middleware(['auth', 'check.trial'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/expired-items', [DashboardController::class, 'getExpiredItems'])->name('dashboard.expired-items');
+    Route::get('/dashboard/low-stock-items', [DashboardController::class, 'getLowStockItems'])->name('dashboard.low-stock-items');
+    Route::get('/dashboard/top-selling-items', [DashboardController::class, 'getTopSellingProducts'])->name('dashboard.top-selling-items');
+    Route::get('/dashboard/bottom-selling-items', [DashboardController::class, 'getBottomSellingProducts'])->name('dashboard.bottom-selling-items');
 });
 
-// Dashboard - all authenticated users
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
-// In routes/web.php
-Route::get('/dashboard/expired-items', [DashboardController::class, 'getExpiredItems'])->name('dashboard.expired-items');
-Route::get('/dashboard/low-stock-items', [DashboardController::class, 'getLowStockItems'])->name('dashboard.low-stock-items');
-
-
-
-// Profile - all authenticated users
-Route::middleware('auth')->group(function () {
+// Profile - all authenticated users with trial check
+Route::middleware(['auth', 'check.trial'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// 🔐 Routes only for super-admin
-Route::middleware(['auth', SuperAdminOnly::class])->group(function () {
+// Super-admin only routes with trial check
+Route::middleware(['auth', 'check.trial', SuperAdminOnly::class])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
@@ -45,10 +52,14 @@ Route::middleware(['auth', SuperAdminOnly::class])->group(function () {
     Route::resource('purchases', PurchaseController::class);
     Route::resource('purchase-items', PurchaseItemController::class);
     Route::get('/products/{id}/price', [ProductController::class, 'getSellingPrice']);
+
+    // Settings page
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
-// ✨ Sales + Reports routes for ALL authenticated users (super-admin & sales-person)
-Route::middleware(['auth'])->group(function () {
+// Sales & reports for all authenticated users with trial check
+Route::middleware(['auth', 'check.trial'])->group(function () {
     // Sales
     Route::resource('sales', SaleController::class);
     Route::resource('sale-items', SaleItemController::class)->only(['index', 'update', 'destroy']);

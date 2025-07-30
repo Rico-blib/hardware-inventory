@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Hardware Inventory') }}</title>
+    <title> {{ $globalSetting?->app_name ?? config('app.name', 'POS System') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,6 +14,9 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if ($globalSetting?->logo_path)
+        <link rel="icon" href="{{ asset('storage/' . $globalSetting->logo_path) }}" type="image/png">
+    @endif
 </head>
 
 <body class="font-sans antialiased bg-gray-100">
@@ -22,7 +25,7 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-gray-900 text-white flex-shrink-0">
             <div class="p-4 text-xl font-bold border-b border-gray-800">
-                Inventory System
+                {{ $globalSetting?->app_name ?? config('app.name', 'Inventory System') }}
             </div>
             <nav class="mt-4">
                 <ul class="space-y-1 p-4 text-sm">
@@ -131,12 +134,15 @@
                     @endif
 
                     <!-- Settings (optional) -->
-                    <li>
-                        <a href="#"
-                            class="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition">
-                            ⚙️ Settings
-                        </a>
-                    </li>
+                    @if (auth()->user()->role === 'super-admin')
+                        <li>
+                            <a href="{{ route('settings.index') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition">
+                                ⚙️ Settings
+                            </a>
+                        </li>
+                    @endif
+
                 </ul>
             </nav>
 
@@ -161,6 +167,7 @@
         </div>
     </div>
     @stack('scripts')
+
 </body>
 
 </html>

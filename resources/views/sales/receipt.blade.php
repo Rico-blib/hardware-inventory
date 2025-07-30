@@ -42,14 +42,39 @@
 </head>
 
 <body>
-    <h2 class="text-center">SALES RECEIPT</h2>
+    {{-- Logo and App Name --}}
+    @if ($settings?->logo)
+        <div class="text-center">
+            <img src="{{ asset('storage/logos/' . $settings->logo) }}" alt="Logo" style="max-height: 80px;">
+        </div>
+    @endif
 
+    <h2 class="text-center">{{ $settings->app_name ?? 'SALES RECEIPT' }}</h2>
+
+    {{-- Contact Details --}}
+    @if ($settings?->contact_number || $settings?->email)
+        <p class="text-center">
+            @if ($settings->contact_number)
+                📞 {{ $settings->contact_number }}<br>
+            @endif
+            @if ($settings->email)
+                ✉️ {{ $settings->email }}
+            @endif
+        </p>
+    @endif
+    <hr style="border: none; border-top: 1px dashed #000; margin: 10px 0;">
+
+    {{-- Sale Information --}}
     <p>
         <strong>Sale ID:</strong> {{ $sale->id }}<br>
         <strong>Date:</strong> {{ $sale->created_at->format('d M Y, H:i') }}<br>
-        <strong>Customer:</strong> {{ $sale->customer->name ?? 'Walk-in' }}
+        <strong>Customer:</strong> {{ $sale->customer->name ?? 'Walk-in' }}<br>
+        <strong>Served By:</strong> {{ $sale->user->name ?? 'Unknown' }} <br>
+        <strong>Payment Method:</strong> {{ ucfirst($sale->payment_method) }}
+
     </p>
 
+    {{-- Items Table --}}
     <table>
         <thead>
             <tr>
@@ -76,6 +101,7 @@
         </tbody>
     </table>
 
+    {{-- Totals --}}
     <div class="totals">
         <p><strong>Subtotal:</strong> Ksh {{ number_format($grandTotal, 2) }}</p>
         <p><strong>Discount:</strong> Ksh {{ number_format($sale->discount, 2) }}</p>

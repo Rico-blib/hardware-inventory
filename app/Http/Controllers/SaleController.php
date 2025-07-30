@@ -8,6 +8,10 @@ use App\Models\Product;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use App\Models\PurchaseItem;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class SaleController extends Controller
 {
@@ -30,6 +34,8 @@ class SaleController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
+            'payment_method' => 'required|in:cash,mpesa,bank',
+
         ]);
 
         $customerId = $request->input('customer_id') ?: null;
@@ -55,6 +61,8 @@ class SaleController extends Controller
             'total' => $total,
             'discount' => $discount,
             'grand_total' => $grandTotal,
+            'user_id' => Auth::id(),
+            'payment_method' => $request->payment_method,
         ]);
 
         // ✅ Process each sale item and deduct stock
@@ -119,8 +127,13 @@ class SaleController extends Controller
 
     public function receipt($id)
     {
-        $sale = Sale::with(['customer', 'items.product'])->findOrFail($id);
-        return view('sales.receipt', compact('sale'));
+        // Load the sale with its relations
+        $sale = Sale::with(['customer', 'items.product', 'user'])->findOrFail($id);
+
+        // Get settings for logo, app name, contacts
+        $settings = Setting::first();
+
+        return view('sales.receipt', compact('sale', 'settings'));
     }
 
     public function update(Request $request, Sale $sale)
