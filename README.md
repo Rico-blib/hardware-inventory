@@ -47,15 +47,15 @@ Run the following to install PHP and JS dependencies:
 1. Copy .env.client to .env
 2. Edit DB_DATABASE, DB_USERNAME, DB_PASSWORD to match your MySQL
 3. Run:
-   composer install
-   php artisan key:generate
-   php artisan migrate --seed
-   php artisan storage:link
-   npm install      (only if you need to rebuild assets)
-   npm run build    (optional – assets already compiled)
- composer install
- npm install
- npm run build
+   - composer install
+   - php artisan key:generate
+   - php artisan migrate --seed
+   - php artisan storage:link
+   - npm install      (only if you need to rebuild assets)
+   - npm run build    (optional – assets already compiled)
+ - composer install
+ - npm install
+ - npm run build
 
 ## 🧱 Step 5: Migrate the Database
 
@@ -70,4 +70,4 @@ Start the Laravel server:
 Login using the default admin credentials:
 
   Email:    admin@gmail.com.com
-  Password: password
+  Password: admin@123
