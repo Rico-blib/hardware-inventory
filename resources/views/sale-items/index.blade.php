@@ -57,53 +57,69 @@
                     @foreach ($items as $item)
                         <tr class="border-t" x-data="{
                             editMode: false,
-                            form: {
-                                quantity: '{{ $item->quantity }}',
-                                price: '{{ $item->price }}'
+                            quantity: '{{ $item->quantity }}',
+                            price: '{{ $item->price }}',
+                            submitForm() {
+                                this.$refs.form.submit();
+                                this.editMode = false;
                             }
                         }">
                             <td class="px-4 py-2">{{ $item->id }}</td>
                             <td class="px-4 py-2">{{ $item->product->name ?? 'N/A' }}</td>
                             <td class="px-4 py-2">{{ $item->sale->customer->name ?? 'Walk-in' }}</td>
 
+                            <!-- Quantity -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.quantity"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('sale-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="number" name="quantity" x-model="form.quantity"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="editMode">
+                                    <input type="number" x-model="quantity" class="border px-2 py-1 w-full" />
+                                </template>
+                                <template x-if="!editMode">
+                                    <span x-text="quantity"></span>
+                                </template>
                             </td>
 
+                            <!-- Price -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.price"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('sale-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="number" step="0.01" name="price" x-model="form.price"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="editMode">
+                                    <input type="number" step="0.01" x-model="price"
+                                        class="border px-2 py-1 w-full" />
+                                </template>
+                                <template x-if="!editMode">
+                                    <span x-text="price"></span>
+                                </template>
                             </td>
 
+                            <!-- Subtotal -->
                             <td class="px-4 py-2">
-                                Ksh <span x-text="(form.quantity * form.price).toFixed(2)"></span>
+                                Ksh <span x-text="(quantity * price).toFixed(2)"></span>
                             </td>
 
+                            <!-- Date -->
                             <td class="px-4 py-2">
                                 {{ $item->sale->created_at->format('d M Y H:i') }}
                             </td>
 
+                            <!-- Actions -->
                             <td class="px-4 py-2 flex space-x-2">
-                                <!-- Edit -->
-                                <button @click="editMode = !editMode" class="text-blue-600 hover:text-blue-800">
-                                    ✏️
+                                <!-- Edit / Save Button -->
+                                <button @click="editMode ? submitForm() : editMode = true" type="button"
+                                    class="text-blue-600 hover:text-blue-800">
+                                    <span x-text="editMode ? '💾' : '✏️'"></span>
                                 </button>
 
-                                <!-- Delete -->
+                                <!-- Hidden Update Form -->
+                                <form x-ref="form" method="POST" action="{{ route('sale-items.update', $item) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="quantity" :value="quantity">
+                                    <input type="hidden" name="price" :value="price">
+                                </form>
+
+                                <!-- Delete Button -->
                                 <form action="{{ route('sale-items.destroy', $item) }}" method="POST"
                                     onsubmit="return confirm('Delete this item?')">
-                                    @csrf @method('DELETE')
+                                    @csrf
+                                    @method('DELETE')
                                     <button class="text-red-600 hover:text-red-800">🗑️</button>
                                 </form>
                             </td>

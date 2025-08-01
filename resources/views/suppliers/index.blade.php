@@ -55,76 +55,62 @@
                 </thead>
                 <tbody>
                     @foreach ($suppliers as $supplier)
-                        <tr class="border-t" x-data="{
-                            editMode: false,
-                            form: {
-                                name: '{{ $supplier->name }}',
-                                address: '{{ $supplier->address }}',
-                                email: '{{ $supplier->email }}',
-                                phone: '{{ $supplier->phone }}'
-                            }
-                        }">
+                        <tr class="border-t" x-data="{ editMode: false }">
                             <td class="px-4 py-2">{{ $supplier->id }}</td>
-                            <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.name"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('suppliers.update', $supplier) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="name" x-model="form.name"
-                                        class="border px-2 py-1 w-full">
-                                </form>
-                            </td>
-                            <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.address"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('suppliers.update', $supplier) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="address" x-model="form.address"
-                                        class="border px-2 py-1 w-full">
-                                </form>
-                            </td>
-                            <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.email"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('suppliers.update', $supplier) }}">
-                                    @csrf @method('PUT')
-                                    <input type="email" name="email" x-model="form.email"
-                                        class="border px-2 py-1 w-full">
-                                </form>
-                            </td>
-                            <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.phone"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('suppliers.update', $supplier) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="phone" x-model="form.phone"
-                                        class="border px-2 py-1 w-full">
-                                </form>
-                            </td>
-                            <td class="px-4 py-2 flex space-x-2">
-                                <!-- Edit Icon -->
-                                <button @click="editMode = !editMode" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.232 5.232l3.536 3.536M9 11l6-6m2 2l-6 6m0 0L4 16l1-5 5-1z" />
-                                    </svg>
-                                </button>
 
-                                <!-- Delete Icon -->
-                                <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </form>
+                            <!-- Name -->
+                            <td class="px-4 py-2">
+                                <span x-show="!editMode">{{ $supplier->name }}</span>
+                                <form x-show="editMode" method="POST"
+                                    action="{{ route('suppliers.update', $supplier) }}">
+                                    @csrf @method('PUT')
+                                    <input type="text" name="name" value="{{ $supplier->name }}"
+                                        class="border px-2 py-1 w-full">
+                            </td>
+
+                            <!-- Address -->
+                            <td class="px-4 py-2">
+                                <span x-show="!editMode">{{ $supplier->address }}</span>
+                                <input x-show="editMode" type="text" name="address" value="{{ $supplier->address }}"
+                                    class="border px-2 py-1 w-full">
+                            </td>
+
+                            <!-- Email -->
+                            <td class="px-4 py-2">
+                                <span x-show="!editMode">{{ $supplier->email }}</span>
+                                <input x-show="editMode" type="email" name="email" value="{{ $supplier->email }}"
+                                    class="border px-2 py-1 w-full">
+                            </td>
+
+                            <!-- Phone -->
+                            <td class="px-4 py-2">
+                                <span x-show="!editMode">{{ $supplier->phone }}</span>
+                                <input x-show="editMode" type="text" name="phone" value="{{ $supplier->phone }}"
+                                    class="border px-2 py-1 w-full">
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-4 py-2 flex gap-2 items-center">
+                                <div x-show="editMode" class="flex gap-1">
+                                    <button type="submit" class="text-green-600 hover:text-green-800">✅</button>
+                                    </form> <!-- close the update form here -->
+                                    <button @click="editMode = false" class="text-gray-500">✖</button>
+                                </div>
+
+                                <div x-show="!editMode" class="flex gap-1">
+                                    <button @click="editMode = true"
+                                        class="text-blue-600 hover:text-blue-800">✏️</button>
+                                    <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST"
+                                        onsubmit="return confirm('Are you sure?')">
+                                        @csrf @method('DELETE')
+                                        <button class="text-red-600 hover:text-red-800">🗑️</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
+
+
                 </tbody>
             </table>
         </div>

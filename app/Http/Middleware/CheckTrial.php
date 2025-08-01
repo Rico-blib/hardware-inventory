@@ -43,6 +43,6 @@ class CheckTrial
         }
 
         // ❌ Trial expired — redirect to activation
-        return redirect()->route('activate.license');
+        return redirect()->route('activation.show');
     }
 }

@@ -61,58 +61,76 @@
                 </thead>
                 <tbody>
                     @foreach ($purchases as $purchase)
-                        <tr class="border-t hover:bg-gray-50" x-data="{
+                        <tr x-data="{
                             editMode: false,
                             form: {
                                 invoice_no: '{{ $purchase->invoice_no }}',
                                 date: '{{ $purchase->date }}',
                                 payment_status: '{{ $purchase->payment_status }}'
+                            },
+                            submit() {
+                                this.$refs.form.submit();
                             }
                         }">
+                            <!-- Hidden Update Form -->
+                            <form method="POST" :action="'{{ route('purchases.update', $purchase) }}'" x-ref="form"
+                                class="hidden">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="invoice_no" :value="form.invoice_no">
+                                <input type="hidden" name="date" :value="form.date">
+                                <input type="hidden" name="payment_status" :value="form.payment_status">
+                            </form>
+
+                            <!-- ID -->
                             <td class="px-4 py-2">{{ $loop->iteration }}</td>
 
+                            <!-- Invoice -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.invoice_no"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchases.update', $purchase) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="invoice_no" x-model="form.invoice_no"
-                                        class="border px-2 py-1 w-full" required>
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.invoice_no"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="text" x-model="form.invoice_no" class="border px-2 py-1 w-full"
+                                        required>
+                                </template>
                             </td>
 
+                            <!-- Supplier (not editable) -->
                             <td class="px-4 py-2">
                                 {{ $purchase->supplier->name }}
                             </td>
 
+                            <!-- Date -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.date"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchases.update', $purchase) }}">
-                                    @csrf @method('PUT')
-                                    <input type="date" name="date" x-model="form.date"
-                                        class="border px-2 py-1 w-full" required>
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.date"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="date" x-model="form.date" class="border px-2 py-1 w-full" required>
+                                </template>
                             </td>
 
+                            <!-- Total -->
                             <td class="px-4 py-2">
                                 Ksh {{ number_format($purchase->total, 2) }}
                             </td>
 
+                            <!-- Payment Status -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.payment_status"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchases.update', $purchase) }}">
-                                    @csrf @method('PUT')
-                                    <select name="payment_status" x-model="form.payment_status"
-                                        class="border px-2 py-1 w-full">
+                                <template x-if="!editMode">
+                                    <span x-text="form.payment_status"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <select x-model="form.payment_status" class="border px-2 py-1 w-full">
                                         <option value="unpaid">Unpaid</option>
                                         <option value="partial">Partial</option>
                                         <option value="paid">Paid</option>
                                     </select>
-                                </form>
+                                </template>
                             </td>
 
+                            <!-- Actions -->
                             <td class="px-4 py-2 text-center">
                                 <div class="flex justify-center gap-2">
                                     <!-- View -->
@@ -121,11 +139,19 @@
                                         <x-heroicon-o-eye class="w-5 h-5" />
                                     </a>
 
-                                    <!-- Edit Toggle -->
-                                    <button @click="editMode = !editMode; if (!editMode) $el.closest('form').submit()"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 p-2 rounded">
-                                        <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                    </button>
+                                    <!-- Edit / Save -->
+                                    <template x-if="editMode">
+                                        <button type="button" @click="submit()"
+                                            class="bg-green-600 text-white px-2 py-1 rounded">
+                                            💾
+                                        </button>
+                                    </template>
+                                    <template x-if="!editMode">
+                                        <button type="button" @click="editMode = true"
+                                            class="bg-green-100 hover:bg-green-200 text-green-700 p-2 rounded">
+                                            <x-heroicon-o-pencil-square class="w-5 h-5" />
+                                        </button>
+                                    </template>
 
                                     <!-- Delete -->
                                     <form action="{{ route('purchases.destroy', $purchase) }}" method="POST"

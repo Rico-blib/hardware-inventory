@@ -55,81 +55,59 @@
                 </thead>
                 <tbody>
                     @foreach ($customers as $customer)
-                        <tr class="border-t" x-data="{
-                            editMode: false,
-                            form: {
-                                name: '{{ $customer->name }}',
-                                address: '{{ $customer->address }}',
-                                email: '{{ $customer->email }}',
-                                phone: '{{ $customer->phone }}'
-                            }
-                        }">
+                        <tr class="border-t" x-data="{ editMode: false }">
                             <td class="px-4 py-2">{{ $customer->id }}</td>
 
+                            <!-- Name -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.name"></span>
+                                <span x-show="!editMode">{{ $customer->name }}</span>
                                 <form x-show="editMode" method="POST"
                                     action="{{ route('customers.update', $customer) }}">
                                     @csrf @method('PUT')
-                                    <input type="text" name="name" x-model="form.name"
+                                    <input type="text" name="name" value="{{ $customer->name }}"
                                         class="border px-2 py-1 w-full">
-                                </form>
                             </td>
 
+                            <!-- Address -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.address"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('customers.update', $customer) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="address" x-model="form.address"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <span x-show="!editMode">{{ $customer->address }}</span>
+                                <input x-show="editMode" type="text" name="address" value="{{ $customer->address }}"
+                                    class="border px-2 py-1 w-full">
                             </td>
 
+                            <!-- Email -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.email"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('customers.update', $customer) }}">
-                                    @csrf @method('PUT')
-                                    <input type="email" name="email" x-model="form.email"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <span x-show="!editMode">{{ $customer->email }}</span>
+                                <input x-show="editMode" type="email" name="email" value="{{ $customer->email }}"
+                                    class="border px-2 py-1 w-full">
                             </td>
 
+                            <!-- Phone -->
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.phone"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('customers.update', $customer) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="phone" x-model="form.phone"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <span x-show="!editMode">{{ $customer->phone }}</span>
+                                <input x-show="editMode" type="text" name="phone" value="{{ $customer->phone }}"
+                                    class="border px-2 py-1 w-full">
                             </td>
 
-                            <td class="px-4 py-2 flex space-x-2">
-                                <!-- Edit icon -->
-                                <button @click="editMode = !editMode" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.232 5.232l3.536 3.536M9 11l6-6m2 2l-6 6m0 0L4 16l1-5 5-1z" />
-                                    </svg>
-                                </button>
-
-                                <!-- Delete icon -->
-                                <form action="{{ route('customers.destroy', $customer) }}" method="POST">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </form>
+                            <!-- Actions -->
+                            <td class="px-4 py-2 flex gap-2 items-center">
+                                <div x-show="editMode" class="flex gap-1">
+                                    <button type="submit" class="text-green-600 hover:text-green-800">✅</button>
+                                    </form> <!-- Close update form here -->
+                                    <button @click="editMode = false" class="text-gray-500">✖</button>
+                                </div>
+                                <div x-show="!editMode" class="flex gap-1">
+                                    <button @click="editMode = true"
+                                        class="text-blue-600 hover:text-blue-800">✏️</button>
+                                    <form action="{{ route('customers.destroy', $customer) }}" method="POST">
+                                        @csrf @method('DELETE')
+                                        <button class="text-red-600 hover:text-red-800">🗑️</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
+
                 </tbody>
             </table>
         </div>

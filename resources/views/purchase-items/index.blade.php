@@ -72,70 +72,81 @@
                             <td class="px-4 py-2">{{ $item->purchase->supplier->name ?? 'N/A' }}</td>
 
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.quantity"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchase-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="number" name="quantity" x-model="form.quantity"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.quantity"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="number" x-model="form.quantity" class="border px-2 py-1 w-full">
+                                </template>
                             </td>
 
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.cost_price"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchase-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="number" step="0.01" name="cost_price" x-model="form.cost_price"
+                                <template x-if="!editMode">
+                                    <span x-text="form.cost_price"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="number" step="0.01" x-model="form.cost_price"
                                         class="border px-2 py-1 w-full">
-                                </form>
+                                </template>
                             </td>
 
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.selling_price"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchase-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="number" step="0.01" name="selling_price"
-                                        x-model="form.selling_price" class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.selling_price"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="number" step="0.01" x-model="form.selling_price"
+                                        class="border px-2 py-1 w-full">
+                                </template>
                             </td>
 
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.batch_no"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchase-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="text" name="batch_no" x-model="form.batch_no"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.batch_no"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="text" x-model="form.batch_no" class="border px-2 py-1 w-full">
+                                </template>
                             </td>
 
                             <td class="px-4 py-2">
-                                <span x-show="!editMode" x-text="form.expiry_date"></span>
-                                <form x-show="editMode" method="POST"
-                                    action="{{ route('purchase-items.update', $item) }}">
-                                    @csrf @method('PUT')
-                                    <input type="date" name="expiry_date" x-model="form.expiry_date"
-                                        class="border px-2 py-1 w-full">
-                                </form>
+                                <template x-if="!editMode">
+                                    <span x-text="form.expiry_date"></span>
+                                </template>
+                                <template x-if="editMode">
+                                    <input type="date" x-model="form.expiry_date" class="border px-2 py-1 w-full">
+                                </template>
                             </td>
 
                             <td class="px-4 py-2 flex space-x-2">
-                                <!-- Edit -->
-                                <button @click="editMode = !editMode" class="text-blue-600 hover:text-blue-800">
-                                    ✏️
-                                </button>
+                                <template x-if="!editMode">
+                                    <button type="button" @click="editMode = true"
+                                        class="text-blue-600 hover:text-blue-800">✏️</button>
+                                </template>
+                                <template x-if="editMode">
+                                    <form method="POST" action="{{ route('purchase-items.update', $item) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="quantity" :value="form.quantity">
+                                        <input type="hidden" name="cost_price" :value="form.cost_price">
+                                        <input type="hidden" name="selling_price" :value="form.selling_price">
+                                        <input type="hidden" name="batch_no" :value="form.batch_no">
+                                        <input type="hidden" name="expiry_date" :value="form.expiry_date">
+                                        <button type="submit" class="text-green-600 hover:text-green-800">✅</button>
+                                    </form>
+                                </template>
 
-                                <!-- Delete -->
                                 <form action="{{ route('purchase-items.destroy', $item) }}" method="POST"
                                     onsubmit="return confirm('Delete this item?')">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-600 hover:text-red-800">🗑️</button>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-800">🗑️</button>
                                 </form>
                             </td>
                         </tr>
                     @endforeach
+
+
                 </tbody>
             </table>
         </div>

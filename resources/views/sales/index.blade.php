@@ -63,91 +63,96 @@
                 </thead>
                 <tbody x-data="{ editing: null }">
                     @forelse ($sales as $sale)
-                        <tr class="border-t hover:bg-gray-50" x-show="editing !== {{ $sale->id }}">
-                            <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                            <td class="px-4 py-2">{{ $sale->invoice_no }}</td>
-                            <td class="px-4 py-2">{{ $sale->customer->name ?? 'Walk-in' }}</td>
-                            <td class="px-4 py-2">{{ $sale->created_at->format('d M Y H:i') }}</td>
-                            <td class="px-4 py-2">Ksh {{ number_format($sale->total, 2) }}</td>
-                            <td class="px-4 py-2">Ksh {{ number_format($sale->discount, 2) }}</td>
-                            <td class="px-4 py-2 font-bold">Ksh {{ number_format($sale->grand_total, 2) }}</td>
-                            <td class="px-4 py-2">{{ ucfirst($sale->payment_method) }}</td>
-                            <td class="px-4 py-2 text-center">
-                                <div class="flex justify-center gap-2">
-                                    <a href="{{ route('sales.show', $sale->id) }}"
-                                        class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-2 rounded">
-                                        <x-heroicon-o-eye class="w-5 h-5" />
-                                    </a>
-
-                                    <button @click="editing = {{ $sale->id }}"
-                                        class="bg-green-100 hover:bg-green-200 text-green-700 p-2 rounded">
-                                        <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                    </button>
-
-                                    <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
-                                        onsubmit="return confirm('Delete this sale?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded">
-                                            <x-heroicon-o-trash class="w-5 h-5" />
+                        <template x-if="editing !== {{ $sale->id }}">
+                            <tr class="border-t hover:bg-gray-50">
+                                <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                                <td class="px-4 py-2">{{ $sale->invoice_no }}</td>
+                                <td class="px-4 py-2">{{ $sale->customer->name ?? 'Walk-in' }}</td>
+                                <td class="px-4 py-2">{{ $sale->created_at->format('d M Y H:i') }}</td>
+                                <td class="px-4 py-2">Ksh {{ number_format($sale->total, 2) }}</td>
+                                <td class="px-4 py-2">Ksh {{ number_format($sale->discount, 2) }}</td>
+                                <td class="px-4 py-2 font-bold">Ksh {{ number_format($sale->grand_total, 2) }}</td>
+                                <td class="px-4 py-2">{{ ucfirst($sale->payment_method) }}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <div class="flex justify-center gap-2">
+                                        <a href="{{ route('sales.show', $sale->id) }}"
+                                            class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-2 rounded">
+                                            <x-heroicon-o-eye class="w-5 h-5" />
+                                        </a>
+                                        <button @click="editing = {{ $sale->id }}"
+                                            class="bg-green-100 hover:bg-green-200 text-green-700 p-2 rounded">
+                                            <x-heroicon-o-pencil-square class="w-5 h-5" />
                                         </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                                        <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
+                                            onsubmit="return confirm('Delete this sale?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded">
+                                                <x-heroicon-o-trash class="w-5 h-5" />
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
 
                         <!-- Inline Edit Row -->
-                        <tr class="bg-gray-100" x-show="editing === {{ $sale->id }}">
-                            <td colspan="8" class="px-4 py-4">
-                                <form action="{{ route('sales.update', $sale->id) }}" method="POST" class="space-y-4">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="flex gap-4 items-center flex-wrap">
-                                        <select name="customer_id" class="border rounded px-3 py-2">
-                                            <option value="">Walk-in</option>
-                                            @foreach ($customers as $customer)
-                                                <option value="{{ $customer->id }}"
-                                                    {{ $sale->customer_id == $customer->id ? 'selected' : '' }}>
-                                                    {{ $customer->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                        <template x-if="editing === {{ $sale->id }}">
+                            <tr class="bg-gray-100">
+                                <td colspan="9" class="px-4 py-6">
+                                    <form action="{{ route('sales.update', $sale->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="flex flex-wrap gap-4 items-center">
+                                            <!-- Customer Dropdown -->
+                                            <select name="customer_id" class="border rounded px-4 py-2 w-60">
+                                                <option value="">Walk-in</option>
+                                                @foreach ($customers as $customer)
+                                                    <option value="{{ $customer->id }}"
+                                                        {{ $sale->customer_id == $customer->id ? 'selected' : '' }}>
+                                                        {{ $customer->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
 
-                                        <input type="number" name="discount" step="0.01"
-                                            value="{{ $sale->discount }}" class="border rounded px-3 py-2"
-                                            oninput="
-                                                    const total = {{ $sale->items->sum(fn($i) => $i->price * $i->quantity) }};
-                                                    const discount = parseFloat(this.value) || 0;
-                                                    this.closest('form').querySelector('.grand-total').textContent = 'Ksh ' + (total - discount).toFixed(2);
-                                               " />
+                                            <!-- Discount Field -->
+                                            <input type="number" name="discount" step="0.01"
+                                                value="{{ $sale->discount }}" class="border rounded px-4 py-2 w-40"
+                                                oninput="
+                                const total = {{ $sale->items->sum(fn($i) => $i->price * $i->quantity) }};
+                                const discount = parseFloat(this.value) || 0;
+                                this.closest('form').querySelector('.grand-total').textContent = 'Ksh ' + (total - discount).toFixed(2);
+                            " />
 
-                                        <span class="font-semibold text-green-700">
-                                            Grand Total:
-                                            <span class="grand-total">
-                                                Ksh {{ number_format($sale->grand_total, 2) }}
+                                            <!-- Grand Total Display -->
+                                            <span class="text-green-700 font-semibold">
+                                                Grand Total: <span class="grand-total">Ksh
+                                                    {{ number_format($sale->grand_total, 2) }}</span>
                                             </span>
-                                        </span>
 
-                                        <div class="flex gap-2 mt-2">
-                                            <button type="submit"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                                Update
-                                            </button>
-                                            <button type="button" @click="editing = null"
-                                                class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded">
-                                                Cancel
-                                            </button>
+                                            <!-- Buttons -->
+                                            <div class="flex gap-2 mt-2">
+                                                <button type="submit"
+                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                                    Update
+                                                </button>
+                                                <button type="button" @click="editing = null"
+                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                                                    Cancel
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
-                            </td>
-                        </tr>
+                                    </form>
+                                </td>
+                            </tr>
+                        </template>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-gray-500">No sales found.</td>
+                            <td colspan="9" class="text-center py-4 text-gray-500">No sales found.</td>
                         </tr>
                     @endforelse
+
                 </tbody>
             </table>
         </div>
